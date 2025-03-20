@@ -29,9 +29,11 @@ def index():
 def battle():
     user_pokemon = request.form.get('user_pokemon', '').lower().strip()
     opponent_pokemon = request.form.get('opponent_pokemon', '').lower().strip()
+    user_trainer = request.form.get('user_trainer', '').lower().strip()
+    opponent_trainer = request.form.get('opponent_trainer', '').lower().strip()
     
-    if not user_pokemon or not opponent_pokemon:
-        return render_template('index.html', error="Please select both Pokémon")
+    if not all([user_pokemon, opponent_pokemon, user_trainer, opponent_trainer]):
+        return render_template('index.html', error="Please select both trainers and Pokémon")
     
     # Fetch data for both Pokémon
     user_data = fetch_pokemon_data(user_pokemon)
@@ -42,6 +44,10 @@ def battle():
     
     if not opponent_data:
         return render_template('index.html', error=f"Could not find Pokémon: {opponent_pokemon}")
+    
+    # Add trainer information
+    user_data['trainer'] = user_trainer
+    opponent_data['trainer'] = opponent_trainer
     
     return render_template('battle.html', 
                           user_pokemon=user_data, 

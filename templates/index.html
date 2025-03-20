@@ -6,207 +6,322 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pokémon Battle Simulator</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
         body {
             font-family: 'Arial', sans-serif;
             max-width: 800px;
             margin: 0 auto;
             padding: 20px;
-            background-color: #f5f5f5;
+            background: linear-gradient(135deg, #1e90ff, #00bfff);
             color: #333;
+            min-height: 100vh;
         }
 
         h1 {
-            color: #e3350d;
+            font-family: 'Press Start 2P', cursive;
+            color: #ffcb05;
             text-align: center;
-            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            margin-bottom: 30px;
+            font-size: 2em;
+            letter-spacing: 2px;
+            -webkit-text-stroke: 2px #3b5ba7;
         }
 
         .battle-form {
-            background-color: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            background-color: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(10px);
+            transform: translateY(0);
+            transition: transform 0.3s ease;
         }
 
-        .pokemon-selection {
+        .battle-form:hover {
+            transform: translateY(-5px);
+        }
+
+        .pokemon-selection,
+        .trainer-selection {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 20px;
+            margin-bottom: 30px;
+            gap: 20px;
         }
 
-        .pokemon-selection div {
+        .pokemon-selection div,
+        .trainer-selection div {
             width: 48%;
+            position: relative;
+        }
+
+        .trainer-preview {
+            width: 100px;
+            height: 100px;
+            margin: 10px auto;
+            display: block;
+            image-rendering: pixelated;
         }
 
         label {
             display: block;
-            margin-bottom: 5px;
+            margin-bottom: 10px;
             font-weight: bold;
+            color: #3b5ba7;
+            font-size: 1.1em;
+            text-transform: uppercase;
         }
 
         select {
             width: 100%;
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
             font-size: 16px;
+            background-color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath fill='%233b5ba7' d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+        }
+
+        select:hover,
+        select:focus {
+            border-color: #3b5ba7;
+            box-shadow: 0 0 10px rgba(59, 91, 167, 0.2);
+            outline: none;
         }
 
         button {
             display: block;
             width: 100%;
-            padding: 12px;
-            background-color: #3b5ba7;
+            padding: 15px;
+            background: linear-gradient(45deg, #3b5ba7, #2a4580);
             color: white;
             border: none;
-            border-radius: 4px;
+            border-radius: 10px;
             font-size: 18px;
             cursor: pointer;
-            transition: background-color 0.3s;
+            transition: all 0.3s ease;
             font-weight: bold;
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 2px;
             position: relative;
+            overflow: hidden;
         }
 
         button:hover {
-            background-color: #2a4580;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(59, 91, 167, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transform: rotate(45deg);
+            transition: all 0.3s ease;
+        }
+
+        button:hover::after {
+            animation: shine 1.5s ease-out;
+        }
+
+        @keyframes shine {
+            0% {
+                transform: translateX(-100%) rotate(45deg);
+            }
+
+            100% {
+                transform: translateX(100%) rotate(45deg);
+            }
         }
 
         .error {
-            color: red;
+            color: #ff3e3e;
             text-align: center;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
             font-weight: bold;
+            padding: 10px;
+            background-color: rgba(255, 62, 62, 0.1);
+            border-radius: 8px;
+            border-left: 4px solid #ff3e3e;
         }
 
         .intro {
             text-align: center;
-            margin-bottom: 20px;
+            margin-bottom: 30px;
+            color: white;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+        }
+
+        .intro p {
+            font-size: 1.2em;
+            margin-top: 20px;
         }
 
         .pokeball {
-            width: 100px;
-            height: 100px;
+            width: 120px;
+            height: 120px;
             margin: 0 auto 20px;
-            background: linear-gradient(to bottom, #ff0000 0%, #ff0000 50%, #f0f0f0 50%, #f0f0f0 100%);
+            background: linear-gradient(to bottom, #ff0000 0%, #ff0000 48%, #333 48%, #333 52%, #f0f0f0 52%, #f0f0f0 100%);
             border-radius: 50%;
             position: relative;
-            border: 5px solid #333;
-            animation: shake 1.5s ease-in-out infinite;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+            border: 8px solid #333;
+            animation: float 3s ease-in-out infinite;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+            transform-style: preserve-3d;
         }
 
         .pokeball:before {
             content: '';
             position: absolute;
             background: #f0f0f0;
-            width: 20px;
-            height: 20px;
+            width: 30px;
+            height: 30px;
             border-radius: 50%;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            border: 4px solid #333;
+            border: 6px solid #333;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+            z-index: 1;
         }
 
-        @keyframes shake {
+        @keyframes float {
 
             0%,
             100% {
-                transform: rotate(-5deg);
+                transform: translateY(0) rotate(0deg);
             }
 
             50% {
-                transform: rotate(5deg);
+                transform: translateY(-20px) rotate(10deg);
             }
         }
 
-        /* Loading spinner */
-        .spinner {
-            display: none;
-            width: 20px;
-            height: 20px;
-            border: 3px solid rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
-            border-top-color: white;
-            animation: spin 1s ease-in-out infinite;
-            position: absolute;
-            right: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-        }
-
-        @keyframes spin {
-            to {
-                transform: translateY(-50%) rotate(360deg);
-            }
-        }
-
-        .loading-text {
-            display: none;
-            margin-left: 10px;
-        }
-
-        .button-text {
-            transition: opacity 0.3s;
-        }
-
-        /* Loading overlay */
         .loading-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(255, 255, 255, 0.9);
+            background: linear-gradient(135deg, rgba(30, 144, 255, 0.95), rgba(0, 191, 255, 0.95));
             display: none;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             z-index: 2000;
+            backdrop-filter: blur(10px);
         }
 
         .loading-spinner {
-            width: 80px;
-            height: 80px;
+            width: 100px;
+            height: 100px;
             border-radius: 50%;
-            border: 8px solid #f3f3f3;
-            border-top: 8px solid #3b5ba7;
-            animation: spin-full 1s linear infinite;
+            border: 10px solid #f3f3f3;
+            border-top: 10px solid #ffcb05;
+            animation: spin-full 1.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite;
         }
 
         .loading-text-overlay {
-            margin-top: 20px;
-            font-size: 20px;
+            margin-top: 30px;
+            font-size: 24px;
             font-weight: bold;
-            color: #333;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            font-family: 'Press Start 2P', cursive;
         }
 
         @keyframes spin-full {
             0% {
-                transform: rotate(0deg);
+                transform: rotate(0deg) scale(1);
+            }
+
+            50% {
+                transform: rotate(180deg) scale(1.2);
             }
 
             100% {
-                transform: rotate(360deg);
+                transform: rotate(360deg) scale(1);
+            }
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .footer p {
+            margin: 10px 0;
+            color: #333;
+        }
+
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 15px;
+        }
+
+        .social-links a {
+            color: #3b5ba7;
+            text-decoration: none;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .social-links a:hover {
+            color: #ffcb05;
+            transform: translateY(-2px);
+        }
+
+        @media (max-width: 600px) {
+
+            .pokemon-selection,
+            .trainer-selection {
+                flex-direction: column;
+            }
+
+            .pokemon-selection div,
+            .trainer-selection div {
+                width: 100%;
+            }
+
+            h1 {
+                font-size: 1.5em;
             }
         }
     </style>
 </head>
 
 <body>
-    <!-- Loading overlay -->
     <div class="loading-overlay" id="loading-overlay">
         <div class="loading-spinner"></div>
-        <div class="loading-text-overlay">Loading Pokémon data...</div>
+        <div class="loading-text-overlay">Loading...</div>
     </div>
 
     <h1>Pokémon Battle Simulator</h1>
 
     <div class="intro">
         <div class="pokeball"></div>
-        <p>Select your Pokémon and your opponent to start a battle!</p>
+        <p>Choose your trainer and Pokémon to start the battle!</p>
     </div>
 
     <div class="battle-form">
@@ -215,11 +330,66 @@
         {% endif %}
 
         <form action="/battle" method="post" id="battle-form">
+            <div class="trainer-selection">
+                <div>
+                    <label for="user_trainer">Your Trainer</label>
+                    <select name="user_trainer" id="user_trainer" required>
+                        <option value="">Choose your trainer</option>
+                        <option value="red">Red</option>
+                        <option value="blue">Blue</option>
+                        <option value="leaf">Leaf</option>
+                        <option value="ethan">Ethan</option>
+                        <option value="brendan">Brendan</option>
+                        <option value="may">May</option>
+                        <option value="lucas">Lucas</option>
+                        <option value="dawn">Dawn</option>
+                        <option value="hilbert">Hilbert</option>
+                        <option value="hilda">Hilda</option>
+                        <option value="nate">Nate</option>
+                        <option value="rosa">Rosa</option>
+                        <option value="calem">Calem</option>
+                        <option value="serena">Serena</option>
+                        <option value="elio">Elio</option>
+                        <option value="selene">Selene</option>
+                        <option value="victor">Victor</option>
+                        <option value="gloria">Gloria</option>
+                        <option value="juliana">Juliana</option>
+                        <option value="nemona">Nemona</option>
+                    </select>
+                    <img src="https://play.pokemonshowdown.com/sprites/trainers/red.png" alt="Trainer preview"
+                        class="trainer-preview" id="user-trainer-preview">
+                </div>
+
+                <div>
+                    <label for="opponent_trainer">Opponent Trainer</label>
+                    <select name="opponent_trainer" id="opponent_trainer" required>
+                        <option value="">Select opponent trainer</option>
+                        <option value="giovanni">Giovanni</option>
+                        <option value="lance">Lance</option>
+                        <option value="cynthia">Cynthia</option>
+                        <option value="steven">Steven</option>
+                        <option value="wallace">Wallace</option>
+                        <option value="n">N</option>
+                        <option value="ghetsis">Ghetsis</option>
+                        <option value="lysandre">Lysandre</option>
+                        <option value="lillie">Lillie</option>
+                        <option value="gladion">Gladion</option>
+                        <option value="leon">Leon</option>
+                        <option value="rose">Rose</option>
+                        <option value="volo">Volo</option>
+                        <option value="sada">Sada</option>
+                        <option value="turo">Turo</option>
+                    </select>
+                    <img src="https://play.pokemonshowdown.com/sprites/trainers/giovanni.png" alt="Trainer preview"
+                        class="trainer-preview" id="opponent-trainer-preview">
+                </div>
+            </div>
+
             <div class="pokemon-selection">
                 <div>
-                    <label for="user_pokemon">Your Pokémon:</label>
+                    <label for="user_pokemon">Your Pokémon</label>
                     <select name="user_pokemon" id="user_pokemon" required>
-                        <option value="">Select a Pokémon</option>
+                        <option value="">Choose your Pokémon</option>
                         {% for pokemon in pokemon_list %}
                         <option value="{{ pokemon }}">{{ pokemon|capitalize }}</option>
                         {% endfor %}
@@ -227,9 +397,9 @@
                 </div>
 
                 <div>
-                    <label for="opponent_pokemon">Opponent's Pokémon:</label>
+                    <label for="opponent_pokemon">Opponent's Pokémon</label>
                     <select name="opponent_pokemon" id="opponent_pokemon" required>
-                        <option value="">Select a Pokémon</option>
+                        <option value="">Select opponent</option>
                         {% for pokemon in pokemon_list %}
                         <option value="{{ pokemon }}">{{ pokemon|capitalize }}</option>
                         {% endfor %}
@@ -238,20 +408,118 @@
             </div>
 
             <button type="submit" id="start-button">
-                <span class="button-text">Start Battle!</span>
-                <span class="spinner" id="button-spinner"></span>
+                Start Battle!
             </button>
         </form>
     </div>
 
+    <footer class="footer">
+        <p>Made with ❤️ by Kaustubh</p>
+        <div class="social-links">
+            <a href="https://github.com/kstubhieeee" target="_blank">GitHub</a>
+            <a href="https://x.com/kstubhiee" target="_blank">Twitter</a>
+            <a href="https://www.linkedin.com/in/kstubhie/" target="_blank">LinkedIn</a>
+        </div>
+    </footer>
+
     <script>
         document.getElementById('battle-form').addEventListener('submit', function (e) {
-            // Show loading spinner in button
-            document.getElementById('button-spinner').style.display = 'block';
-            document.querySelector('.button-text').style.opacity = '0.5';
+            const loadingOverlay = document.getElementById('loading-overlay');
+            loadingOverlay.style.display = 'flex';
 
-            // Show loading overlay
-            document.getElementById('loading-overlay').style.display = 'flex';
+            // Add loading text animation
+            const loadingText = document.querySelector('.loading-text-overlay');
+            let dots = 0;
+            setInterval(() => {
+                dots = (dots + 1) % 4;
+                loadingText.textContent = 'Loading' + '.'.repeat(dots);
+            }, 500);
+        });
+
+        // Add hover sound effect to button
+        const button = document.getElementById('start-button');
+        button.addEventListener('mouseenter', () => {
+            const hoverSound = new Audio('data:audio/wav;base64,UklGRl9vAAAKAAAABAAQAAABAAgAZGF0YU');
+            hoverSound.volume = 0.2;
+            hoverSound.play().catch(() => { });
+        });
+
+        // Update trainer preview images
+        function updateTrainerPreview(selectId, previewId) {
+            const select = document.getElementById(selectId);
+            const preview = document.getElementById(previewId);
+
+            // List of available trainers with their Showdown sprite URLs
+            const trainers = {
+                'red': 'https://play.pokemonshowdown.com/sprites/trainers/red.png',
+                'blue': 'https://play.pokemonshowdown.com/sprites/trainers/blue.png',
+                'leaf': 'https://play.pokemonshowdown.com/sprites/trainers/leaf-gen3.png',
+                'ethan': 'https://play.pokemonshowdown.com/sprites/trainers/ethan.png',
+                'brendan': 'https://play.pokemonshowdown.com/sprites/trainers/brendan.png',
+                'may': 'https://play.pokemonshowdown.com/sprites/trainers/may.png',
+                'lucas': 'https://play.pokemonshowdown.com/sprites/trainers/lucas.png',
+                'dawn': 'https://play.pokemonshowdown.com/sprites/trainers/dawn.png',
+                'hilbert': 'https://play.pokemonshowdown.com/sprites/trainers/hilbert.png',
+                'hilda': 'https://play.pokemonshowdown.com/sprites/trainers/hilda.png',
+                'nate': 'https://play.pokemonshowdown.com/sprites/trainers/nate.png',
+                'rosa': 'https://play.pokemonshowdown.com/sprites/trainers/rosa.png',
+                'calem': 'https://play.pokemonshowdown.com/sprites/trainers/calem.png',
+                'serena': 'https://play.pokemonshowdown.com/sprites/trainers/serena.png',
+                'elio': 'https://play.pokemonshowdown.com/sprites/trainers/elio.png',
+                'selene': 'https://play.pokemonshowdown.com/sprites/trainers/selene.png',
+                'victor': 'https://play.pokemonshowdown.com/sprites/trainers/victor.png',
+                'gloria': 'https://play.pokemonshowdown.com/sprites/trainers/gloria.png',
+                'juliana': 'https://play.pokemonshowdown.com/sprites/trainers/juliana-s.png',
+                'nemona': 'https://play.pokemonshowdown.com/sprites/trainers/nemona-s.png',
+                'giovanni': 'https://play.pokemonshowdown.com/sprites/trainers/giovanni.png',
+                'lance': 'https://play.pokemonshowdown.com/sprites/trainers/lance.png',
+                'cynthia': 'https://play.pokemonshowdown.com/sprites/trainers/cynthia.png',
+                'steven': 'https://play.pokemonshowdown.com/sprites/trainers/steven.png',
+                'wallace': 'https://play.pokemonshowdown.com/sprites/trainers/wallace.png',
+                'n': 'https://play.pokemonshowdown.com/sprites/trainers/n.png',
+                'ghetsis': 'https://play.pokemonshowdown.com/sprites/trainers/ghetsis.png',
+                'lysandre': 'https://play.pokemonshowdown.com/sprites/trainers/lysandre.png',
+                'lillie': 'https://play.pokemonshowdown.com/sprites/trainers/lillie.png',
+                'gladion': 'https://play.pokemonshowdown.com/sprites/trainers/gladion.png',
+                'leon': 'https://play.pokemonshowdown.com/sprites/trainers/leon.png',
+                'rose': 'https://play.pokemonshowdown.com/sprites/trainers/rose.png',
+                'volo': 'https://play.pokemonshowdown.com/sprites/trainers/volo.png',
+                'sada': 'https://play.pokemonshowdown.com/sprites/trainers/sada.png',
+                'turo': 'https://play.pokemonshowdown.com/sprites/trainers/turo.png'
+            };
+
+            // Function to get random trainer URL
+            function getRandomTrainer() {
+                const trainerKeys = Object.keys(trainers);
+                return trainers[trainerKeys[Math.floor(Math.random() * trainerKeys.length)]];
+            }
+
+            // Set initial random trainer
+            preview.src = getRandomTrainer();
+
+            // Update on change
+            select.addEventListener('change', () => {
+                const trainer = select.value;
+                if (trainer && trainers[trainer]) {
+                    preview.src = trainers[trainer];
+                } else {
+                    // Show random trainer when no selection
+                    preview.src = getRandomTrainer();
+                }
+            });
+        }
+
+        updateTrainerPreview('user_trainer', 'user-trainer-preview');
+        updateTrainerPreview('opponent_trainer', 'opponent-trainer-preview');
+
+        // Prevent duplicate form submissions
+        let formSubmitted = false;
+        document.getElementById('battle-form').addEventListener('submit', function (e) {
+            if (formSubmitted) {
+                e.preventDefault();
+                return false;
+            }
+            formSubmitted = true;
         });
     </script>
 </body>

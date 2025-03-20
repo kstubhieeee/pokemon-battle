@@ -6,34 +6,41 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pokémon Battle</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
         body {
             font-family: 'Arial', sans-serif;
             margin: 0;
             padding: 0;
-            background-color: #f5f5f5;
+            background: linear-gradient(135deg, #1e90ff, #00bfff);
             color: #333;
+            min-height: 100vh;
         }
 
         .battle-container {
-            max-width: 800px;
+            max-width: 1000px;
             margin: 20px auto;
             position: relative;
+            padding: 0 20px;
         }
 
         .battle-scene {
-            background-color: #a8d5ba;
-            border-radius: 10px;
-            padding: 20px;
+            background: url('https://assets.pokemon.com/static2/_ui/img/chrome/container_bg.png');
+            background-size: cover;
+            border-radius: 20px;
+            padding: 30px;
             position: relative;
-            height: 300px;
-            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+            height: 400px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
             overflow: hidden;
+            border: 4px solid #ffcb05;
         }
 
         .opponent-area,
         .player-area {
             position: absolute;
             width: 100%;
+            transition: all 0.3s ease;
         }
 
         .opponent-area {
@@ -48,219 +55,211 @@
         }
 
         .pokemon-sprite {
-            width: 120px;
-            height: 120px;
+            width: 150px;
+            height: 150px;
             image-rendering: pixelated;
+            transition: all 0.3s ease;
+            filter: drop-shadow(0 5px 10px rgba(0, 0, 0, 0.3));
         }
 
         .opponent-sprite {
             position: absolute;
             top: 60px;
             left: 400px;
+            animation: float-opponent 3s ease-in-out infinite;
         }
 
         .player-sprite {
             position: absolute;
             bottom: 60px;
             left: 150px;
+            animation: float-player 3s ease-in-out infinite;
+        }
+
+        @keyframes float-opponent {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        @keyframes float-player {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        .stats-box {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(10px);
+            border: 2px solid #3b5ba7;
+            transition: all 0.3s ease;
+        }
+
+        .stats-box:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .pokemon-name {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 1.2em;
+            margin-bottom: 10px;
+            color: #3b5ba7;
+            text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.2);
         }
 
         .hp-bar {
-            width: 150px;
-            height: 10px;
-            background-color: #ccc;
-            border-radius: 5px;
+            width: 200px;
+            height: 15px;
+            background-color: #ddd;
+            border-radius: 10px;
             overflow: hidden;
-            margin-top: 5px;
+            border: 2px solid #333;
+            box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.2);
         }
 
         .hp-fill {
             height: 100%;
-            background-color: #78c850;
+            background: linear-gradient(90deg, #78c850, #4CAF50);
             width: 100%;
-            transition: width 0.5s;
+            transition: width 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
         }
 
         .hp-fill.yellow {
-            background-color: #f8d030;
+            background: linear-gradient(90deg, #f8d030, #DAA520);
         }
 
         .hp-fill.red {
-            background-color: #f05030;
-        }
-
-        .stats-box {
-            background-color: white;
-            border-radius: 5px;
-            padding: 10px;
-            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
-            display: inline-block;
-        }
-
-        .opponent-stats {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-        }
-
-        .player-stats {
-            position: absolute;
-            bottom: 20px;
-            right: 20px;
-        }
-
-        .pokemon-name {
-            font-weight: bold;
-            margin-bottom: 5px;
+            background: linear-gradient(90deg, #f05030, #8B0000);
         }
 
         .battle-controls {
-            background-color: white;
-            border-radius: 10px;
-            padding: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 25px;
             margin-top: 20px;
-            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(10px);
+            border: 3px solid #3b5ba7;
         }
 
         .battle-message {
-            background-color: white;
-            border-radius: 10px;
-            padding: 15px;
+            font-family: 'Press Start 2P', cursive;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 20px;
             margin-top: 20px;
-            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
-            min-height: 50px;
-            font-size: 18px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            min-height: 60px;
+            font-size: 16px;
             text-align: center;
+            line-height: 1.5;
+            color: #333;
+            border: 3px solid #ffcb05;
         }
 
         .move-buttons {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
         }
 
         .move-button {
-            padding: 10px;
+            padding: 15px;
             border: none;
-            border-radius: 5px;
+            border-radius: 10px;
             cursor: pointer;
             font-size: 16px;
             font-weight: bold;
             color: white;
-            text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.5);
-            transition: transform 0.1s, box-shadow 0.1s;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: relative;
+            overflow: hidden;
         }
 
         .move-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
         }
 
         .move-button:active {
-            transform: translateY(0);
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            transform: translateY(-1px);
         }
 
         .move-button:disabled {
-            opacity: 0.5;
+            opacity: 0.7;
             cursor: not-allowed;
             transform: none;
-            box-shadow: none;
         }
 
-        .type-normal {
-            background-color: #a8a878;
+        .move-button::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transform: rotate(45deg);
+            transition: all 0.3s ease;
         }
 
-        .type-fire {
-            background-color: #f08030;
+        .move-button:hover::after {
+            animation: shine 1.5s ease-out;
         }
 
-        .type-water {
-            background-color: #6890f0;
-        }
+        @keyframes shine {
+            0% {
+                transform: translateX(-100%) rotate(45deg);
+            }
 
-        .type-electric {
-            background-color: #f8d030;
-        }
-
-        .type-grass {
-            background-color: #78c850;
-        }
-
-        .type-ice {
-            background-color: #98d8d8;
-        }
-
-        .type-fighting {
-            background-color: #c03028;
-        }
-
-        .type-poison {
-            background-color: #a040a0;
-        }
-
-        .type-ground {
-            background-color: #e0c068;
-        }
-
-        .type-flying {
-            background-color: #a890f0;
-        }
-
-        .type-psychic {
-            background-color: #f85888;
-        }
-
-        .type-bug {
-            background-color: #a8b820;
-        }
-
-        .type-rock {
-            background-color: #b8a038;
-        }
-
-        .type-ghost {
-            background-color: #705898;
-        }
-
-        .type-dragon {
-            background-color: #7038f8;
-        }
-
-        .type-dark {
-            background-color: #705848;
-        }
-
-        .type-steel {
-            background-color: #b8b8d0;
-        }
-
-        .type-fairy {
-            background-color: #ee99ac;
+            100% {
+                transform: translateX(100%) rotate(45deg);
+            }
         }
 
         .back-button {
             display: block;
             width: 200px;
             margin: 20px auto;
-            padding: 10px;
-            background-color: #3b5ba7;
+            padding: 15px;
+            background: linear-gradient(45deg, #3b5ba7, #2a4580);
             color: white;
             border: none;
-            border-radius: 4px;
+            border-radius: 10px;
             font-size: 16px;
             cursor: pointer;
             text-align: center;
             text-decoration: none;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
         }
 
         .back-button:hover {
-            background-color: #2a4580;
-        }
-
-        .hidden {
-            display: none !important;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(59, 91, 167, 0.4);
         }
 
         .battle-result {
@@ -269,94 +268,224 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.8);
+            background: rgba(0, 0, 0, 0.9);
             display: flex;
             justify-content: center;
             align-items: center;
             z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.5s ease;
+        }
+
+        .battle-result.visible {
+            opacity: 1;
+            visibility: visible;
         }
 
         .result-content {
-            background-color: white;
-            padding: 30px;
-            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 40px;
+            border-radius: 20px;
             text-align: center;
-            max-width: 400px;
+            max-width: 500px;
+            transform: scale(0.8);
+            transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            border: 4px solid #ffcb05;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        .battle-result.visible .result-content {
+            transform: scale(1);
         }
 
         .result-title {
-            font-size: 24px;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 28px;
             margin-bottom: 20px;
             color: #e3350d;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
         }
 
         .result-message {
-            font-size: 18px;
-            margin-bottom: 20px;
+            font-size: 20px;
+            margin-bottom: 30px;
+            color: #333;
+            line-height: 1.5;
         }
 
         .new-battle-button {
-            padding: 10px 20px;
-            background-color: #3b5ba7;
+            padding: 15px 30px;
+            background: linear-gradient(45deg, #3b5ba7, #2a4580);
             color: white;
             border: none;
-            border-radius: 5px;
-            font-size: 16px;
+            border-radius: 10px;
+            font-size: 18px;
             cursor: pointer;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            transition: all 0.3s ease;
         }
 
         .new-battle-button:hover {
-            background-color: #2a4580;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(59, 91, 167, 0.4);
         }
 
-        /* Loading overlay */
         .loading-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(255, 255, 255, 0.9);
+            background: linear-gradient(135deg, rgba(30, 144, 255, 0.95), rgba(0, 191, 255, 0.95));
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             z-index: 2000;
+            backdrop-filter: blur(10px);
         }
 
         .loading-spinner {
-            width: 80px;
-            height: 80px;
+            width: 100px;
+            height: 100px;
             border-radius: 50%;
-            border: 8px solid #f3f3f3;
-            border-top: 8px solid #3b5ba7;
-            animation: spin 1s linear infinite;
+            border: 10px solid #f3f3f3;
+            border-top: 10px solid #ffcb05;
+            animation: spin 1.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite;
         }
 
         .loading-text {
-            margin-top: 20px;
-            font-size: 20px;
+            margin-top: 30px;
+            font-size: 24px;
             font-weight: bold;
-            color: #333;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            font-family: 'Press Start 2P', cursive;
         }
 
         @keyframes spin {
             0% {
-                transform: rotate(0deg);
+                transform: rotate(0deg) scale(1);
+            }
+
+            50% {
+                transform: rotate(180deg) scale(1.2);
             }
 
             100% {
-                transform: rotate(360deg);
+                transform: rotate(360deg) scale(1);
+            }
+        }
+
+        /* Type-specific colors for move buttons */
+        .type-normal {
+            background: linear-gradient(45deg, #A8A878, #8A8A59);
+        }
+
+        .type-fire {
+            background: linear-gradient(45deg, #F08030, #DD6610);
+        }
+
+        .type-water {
+            background: linear-gradient(45deg, #6890F0, #386CEB);
+        }
+
+        .type-electric {
+            background: linear-gradient(45deg, #F8D030, #F0C000);
+        }
+
+        .type-grass {
+            background: linear-gradient(45deg, #78C850, #4A892B);
+        }
+
+        .type-ice {
+            background: linear-gradient(45deg, #98D8D8, #69C6C6);
+        }
+
+        .type-fighting {
+            background: linear-gradient(45deg, #C03028, #9D2721);
+        }
+
+        .type-poison {
+            background: linear-gradient(45deg, #A040A0, #803380);
+        }
+
+        .type-ground {
+            background: linear-gradient(45deg, #E0C068, #D4A82F);
+        }
+
+        .type-flying {
+            background: linear-gradient(45deg, #A890F0, #9180C4);
+        }
+
+        .type-psychic {
+            background: linear-gradient(45deg, #F85888, #F61C5D);
+        }
+
+        .type-bug {
+            background: linear-gradient(45deg, #A8B820, #8B9A1A);
+        }
+
+        .type-rock {
+            background: linear-gradient(45deg, #B8A038, #93802D);
+        }
+
+        .type-ghost {
+            background: linear-gradient(45deg, #705898, #554374);
+        }
+
+        .type-dragon {
+            background: linear-gradient(45deg, #7038F8, #4C08EF);
+        }
+
+        .type-dark {
+            background: linear-gradient(45deg, #705848, #513F34);
+        }
+
+        .type-steel {
+            background: linear-gradient(45deg, #B8B8D0, #9797BA);
+        }
+
+        .type-fairy {
+            background: linear-gradient(45deg, #EE99AC, #E7707E);
+        }
+
+        @media (max-width: 768px) {
+            .battle-scene {
+                height: 300px;
+            }
+
+            .pokemon-sprite {
+                width: 100px;
+                height: 100px;
+            }
+
+            .move-buttons {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-box {
+                padding: 10px;
+            }
+
+            .pokemon-name {
+                font-size: 1em;
+            }
+
+            .hp-bar {
+                width: 150px;
             }
         }
     </style>
 </head>
 
 <body>
-    <!-- Loading overlay -->
     <div class="loading-overlay" id="loading-overlay">
         <div class="loading-spinner"></div>
-        <div class="loading-text">Loading Pokémon data...</div>
+        <div class="loading-text">Loading Battle...</div>
     </div>
 
     <div class="battle-container">
@@ -402,7 +531,7 @@
             </div>
         </div>
 
-        <a href="/" class="back-button">Back to Selection</a>
+        <a href="/" class="back-button">New Battle</a>
     </div>
 
     <div class="battle-result hidden" id="battle-result">
@@ -414,7 +543,7 @@
     </div>
 
     <script>
-        // Store Pokémon data with error handling
+        // Store Pokémon data
         const userPokemon = {
             name: "{{ user_pokemon.name }}",
             stats: {
@@ -449,6 +578,7 @@
         const playerHpFill = document.getElementById('player-hp-fill');
         const playerHpText = document.getElementById('player-hp');
         const opponentHpFill = document.getElementById('opponent-hp-fill');
+
         const opponentHpText = document.getElementById('opponent-hp');
         const battleMessage = document.getElementById('battle-message');
         const moveButtons = document.getElementById('move-buttons');
@@ -467,22 +597,33 @@
                 const moveId = this.getAttribute('data-move-id');
                 useMove(moveId);
 
+                // Add click animation
+                this.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    this.style.transform = '';
+                }, 100);
+
                 // Disable all move buttons during attack sequence
                 document.querySelectorAll('.move-button').forEach(btn => {
                     btn.disabled = true;
                 });
             });
+
+            // Add hover sound effect
+            button.addEventListener('mouseenter', () => {
+                const hoverSound = new Audio('data:audio/wav;base64,UklGRl9vAAAKAAAABAAQAAABAAgAZGF0YU');
+                hoverSound.volume = 0.2;
+                hoverSound.play().catch(() => { });
+            });
         });
 
         function useMove(moveId) {
-            // Prepare data for the attack
             const attackData = {
                 user_pokemon: userPokemon,
                 opponent_pokemon: opponentPokemon,
                 move_id: parseInt(moveId)
             };
 
-            // Send attack data to server
             fetch('/attack', {
                 method: 'POST',
                 headers: {
@@ -506,7 +647,6 @@
                     console.error('Error:', error);
                     battleMessage.textContent = 'An error occurred during the battle.';
 
-                    // Re-enable move buttons
                     document.querySelectorAll('.move-button').forEach(btn => {
                         btn.disabled = false;
                     });
@@ -514,24 +654,31 @@
         }
 
         function processAttack(data) {
-            // Update battle message with user's attack
-            battleMessage.textContent = data.message;
+            // User's attack animation
+            const opponentSprite = document.getElementById('opponent-sprite');
+            opponentSprite.style.animation = 'none';
+            opponentSprite.style.transform = 'translateX(20px)';
+            setTimeout(() => {
+                opponentSprite.style.transform = 'translateX(-20px)';
+                setTimeout(() => {
+                    opponentSprite.style.transform = '';
+                    opponentSprite.style.animation = 'float-opponent 3s ease-in-out infinite';
+                }, 100);
+            }, 100);
 
-            // Update opponent's HP
+            battleMessage.textContent = data.message;
             opponentPokemon.current_hp = data.opponent_hp;
 
-            // Animate opponent taking damage
             setTimeout(() => {
                 updateHpBar(opponentHpFill, opponentPokemon.current_hp, opponentPokemon.stats.hp);
                 opponentHpText.textContent = opponentPokemon.current_hp;
 
-                // Check if opponent fainted
                 if (data.opponent_fainted) {
                     setTimeout(() => {
-                        document.getElementById('opponent-sprite').style.opacity = 0.3;
+                        opponentSprite.style.opacity = 0.3;
+                        opponentSprite.style.transform = 'translateY(20px)';
                         battleMessage.textContent = `${opponentPokemon.name} fainted!`;
 
-                        // Show battle result
                         setTimeout(() => {
                             showBattleResult(true);
                         }, 1500);
@@ -543,20 +690,30 @@
                 setTimeout(() => {
                     battleMessage.textContent = data.opponent_message;
 
-                    // Update user's HP
+                    // Player's Pokemon taking damage animation
+                    const playerSprite = document.getElementById('player-sprite');
+                    playerSprite.style.animation = 'none';
+                    playerSprite.style.transform = 'translateX(-20px)';
+                    setTimeout(() => {
+                        playerSprite.style.transform = 'translateX(20px)';
+                        setTimeout(() => {
+                            playerSprite.style.transform = '';
+                            playerSprite.style.animation = 'float-player 3s ease-in-out infinite';
+                        }, 100);
+                    }, 100);
+
                     userPokemon.current_hp = data.user_hp;
 
                     setTimeout(() => {
                         updateHpBar(playerHpFill, userPokemon.current_hp, userPokemon.stats.hp);
                         playerHpText.textContent = userPokemon.current_hp;
 
-                        // Check if user fainted
                         if (data.user_fainted) {
                             setTimeout(() => {
-                                document.getElementById('player-sprite').style.opacity = 0.3;
+                                playerSprite.style.opacity = 0.3;
+                                playerSprite.style.transform = 'translateY(20px)';
                                 battleMessage.textContent = `${userPokemon.name} fainted!`;
 
-                                // Show battle result
                                 setTimeout(() => {
                                     showBattleResult(false);
                                 }, 1500);
@@ -564,7 +721,6 @@
                             return;
                         }
 
-                        // Re-enable move buttons for next turn
                         setTimeout(() => {
                             battleMessage.textContent = `What will ${userPokemon.name} do?`;
                             document.querySelectorAll('.move-button').forEach(btn => {
@@ -580,7 +736,6 @@
             const percentage = (currentHp / maxHp) * 100;
             hpBar.style.width = percentage + '%';
 
-            // Change color based on HP percentage
             if (percentage <= 20) {
                 hpBar.className = 'hp-fill red';
             } else if (percentage <= 50) {
@@ -592,6 +747,7 @@
 
         function showBattleResult(userWon) {
             battleResult.classList.remove('hidden');
+            battleResult.classList.add('visible');
 
             if (userWon) {
                 resultTitle.textContent = 'Victory!';
@@ -604,9 +760,11 @@
 
         // Hide loading overlay when everything is loaded
         window.addEventListener('load', function () {
-            // Give a small delay to ensure everything is rendered
             setTimeout(() => {
-                loadingOverlay.classList.add('hidden');
+                loadingOverlay.style.opacity = '0';
+                setTimeout(() => {
+                    loadingOverlay.style.display = 'none';
+                }, 500);
             }, 500);
         });
     </script>
