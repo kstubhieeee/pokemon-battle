@@ -18,15 +18,14 @@
         }
 
         .battle-container {
-            max-width: 1000px;
+            max-width: 1200px;
             margin: 20px auto;
             position: relative;
             padding: 0 20px;
         }
 
         .battle-scene {
-            background: url('https://assets.pokemon.com/static2/_ui/img/chrome/container_bg.png');
-            background-size: cover;
+            background: linear-gradient(180deg, #87CEEB 0%, #4A90E2 100%);
             border-radius: 20px;
             padding: 30px;
             position: relative;
@@ -36,141 +35,285 @@
             border: 4px solid #ffcb05;
         }
 
-        .opponent-area,
-        .player-area {
+        .battle-terrain {
             position: absolute;
-            width: 100%;
-            transition: all 0.3s ease;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 150px;
+            background: url('https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/gen-3-back/battle-terrain.png') repeat-x bottom;
+            background-size: auto 100%;
+            z-index: 1;
+        }
+
+        .terrain-platform {
+            position: absolute;
+            width: 160px;
+            height: 40px;
+            background: url('https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/gen-3-back/battle-platform.png') no-repeat center;
+            background-size: contain;
+            z-index: 2;
+        }
+
+        .opponent-platform {
+            top: 30%;
+            right: 15%;
+        }
+
+        .player-platform {
+            bottom: 25%;
+            left: 15%;
         }
 
         .opponent-area {
-            top: 20px;
-            left: 0;
+            position: absolute;
+            top: 15%;
+            right: 15%;
+            display: flex;
+            align-items: center;
+            z-index: 2;
         }
 
         .player-area {
-            bottom: 20px;
-            right: 0;
-            text-align: right;
+            position: absolute;
+            bottom: 15%;
+            left: 15%;
+            display: flex;
+            align-items: center;
+            z-index: 2;
         }
 
-        .pokemon-sprite {
-            width: 150px;
-            height: 150px;
-            image-rendering: pixelated;
-            transition: all 0.3s ease;
-            filter: drop-shadow(0 5px 10px rgba(0, 0, 0, 0.3));
+        .opponent-stats {
+            order: 1;
+            margin-left: 20px;
+        }
+
+        .player-stats {
+            order: 2;
+            margin-right: 20px;
         }
 
         .opponent-sprite {
-            position: absolute;
-            top: 60px;
-            left: 400px;
-            animation: float-opponent 3s ease-in-out infinite;
+            order: 2;
         }
 
         .player-sprite {
-            position: absolute;
-            bottom: 60px;
-            left: 150px;
-            animation: float-player 3s ease-in-out infinite;
-        }
-
-        @keyframes float-opponent {
-
-            0%,
-            100% {
-                transform: translateY(0);
-            }
-
-            50% {
-                transform: translateY(-10px);
-            }
-        }
-
-        @keyframes float-player {
-
-            0%,
-            100% {
-                transform: translateY(0);
-            }
-
-            50% {
-                transform: translateY(-10px);
-            }
+            order: 1;
         }
 
         .stats-box {
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 15px;
-            padding: 15px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-            backdrop-filter: blur(10px);
-            border: 2px solid #3b5ba7;
-            transition: all 0.3s ease;
-        }
-
-        .stats-box:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
-        }
-
-        .pokemon-name {
-            font-family: 'Press Start 2P', cursive;
-            font-size: 1.2em;
-            margin-bottom: 10px;
-            color: #3b5ba7;
-            text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.2);
-        }
-
-        .hp-bar {
-            width: 200px;
-            height: 15px;
-            background-color: #ddd;
+            background: linear-gradient(135deg, #f5f5f5, #e0e0e0);
+            border: 3px solid #3b5ba7;
             border-radius: 10px;
-            overflow: hidden;
-            border: 2px solid #333;
-            box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.2);
+            padding: 12px;
+            width: 250px;
+            position: relative;
+            z-index: 3;
+            transform: none;
         }
 
-        .hp-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #78c850, #4CAF50);
-            width: 100%;
-            transition: width 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        .trainer-container {
+            position: absolute;
+            width: 120px;
+            text-align: center;
+            z-index: 2;
+            transition: opacity 0.5s ease-out;
         }
 
-        .hp-fill.yellow {
-            background: linear-gradient(90deg, #f8d030, #DAA520);
+        .opponent-trainer {
+            top: 20%;
+            right: 25%;
         }
 
-        .hp-fill.red {
-            background: linear-gradient(90deg, #f05030, #8B0000);
+        .player-trainer {
+            bottom: 20%;
+            left: 25%;
+        }
+
+        .pokemon-sprite {
+            width: 120px;
+            height: 120px;
+            image-rendering: pixelated;
+            filter: drop-shadow(2px 4px 6px rgba(0, 0, 0, 0.3));
+            position: relative;
+            z-index: 2;
+            opacity: 0;
+            transform: scale(0);
+            transition: all 0.5s ease-out;
+        }
+
+        .pokemon-sprite.active {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .pokeball {
+            width: 40px;
+            height: 40px;
+            position: absolute;
+            z-index: 3;
+            transition: all 0.5s ease-out;
+            opacity: 0;
+        }
+
+        .opponent-pokeball {
+            top: 30%;
+            left: 15%;
+        }
+
+        .player-pokeball {
+            bottom: 30%;
+            right: 15%;
+        }
+
+        .trainer-name {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 0.8em;
+            color: #fff;
+            text-shadow: 2px 2px 2px rgba(0, 0, 0, 0.5);
+            margin-top: 5px;
+            background: rgba(0, 0, 0, 0.6);
+            padding: 5px;
+            border-radius: 5px;
         }
 
         .battle-controls {
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 20px;
-            padding: 25px;
+            background: linear-gradient(135deg, #f5f5f5, #e0e0e0);
+            border-radius: 15px;
+            padding: 20px;
             margin-top: 20px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-            backdrop-filter: blur(10px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
             border: 3px solid #3b5ba7;
+            position: relative;
+            z-index: 3;
         }
 
         .battle-message {
             font-family: 'Press Start 2P', cursive;
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 20px;
-            padding: 20px;
+            background: linear-gradient(135deg, #f5f5f5, #e0e0e0);
+            border-radius: 15px;
+            padding: 15px;
             margin-top: 20px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-            min-height: 60px;
-            font-size: 16px;
-            text-align: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            min-height: 50px;
+            font-size: 14px;
+            text-align: left;
             line-height: 1.5;
             color: #333;
-            border: 3px solid #ffcb05;
+            border: 3px solid #3b5ba7;
+            position: relative;
+            z-index: 3;
+        }
+
+        .battle-announcement {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            font-family: 'Press Start 2P', cursive;
+            text-align: center;
+            z-index: 1000;
+            display: none;
+            animation: fadeInOut 3s ease-in-out;
+            white-space: pre-line;
+        }
+
+        @keyframes fadeInOut {
+            0% {
+                opacity: 0;
+            }
+
+            10% {
+                opacity: 1;
+            }
+
+            90% {
+                opacity: 1;
+            }
+
+            100% {
+                opacity: 0;
+            }
+        }
+
+        .battle-dialogue {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            font-family: 'Press Start 2P', cursive;
+            text-align: center;
+            z-index: 1000;
+            display: none;
+            animation: fadeInOut 2s ease-in-out;
+            white-space: pre-line;
+        }
+
+        .hp-bar {
+            width: 180px;
+            height: 12px;
+            background-color: #ddd;
+            border-radius: 6px;
+            overflow: hidden;
+            border: 2px solid #333;
+            box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.2);
+            margin: 5px 0;
+        }
+
+        .hp-fill {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to right, #00ff00, #48d048);
+            transition: width 1s ease-in-out, background-color 0.5s ease;
+        }
+
+        .hp-fill.yellow {
+            background: linear-gradient(to right, #ffd700, #ffa500);
+        }
+
+        .hp-fill.red {
+            background: linear-gradient(to right, #ff4444, #cc0000);
+        }
+
+        @keyframes hpDecrease {
+            0% {
+                transform: translateX(0);
+            }
+
+            50% {
+                transform: translateX(-5px);
+            }
+
+            100% {
+                transform: translateX(0);
+            }
+        }
+
+        .hp-bar.damage {
+            animation: hpDecrease 0.3s ease-in-out;
+        }
+
+        .pokemon-name {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 1em;
+            color: #333;
+            margin-bottom: 5px;
+            text-shadow: 1px 1px 1px rgba(255, 255, 255, 0.5);
+        }
+
+        .hp-text {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 0.8em;
+            color: #333;
+            margin-top: 5px;
         }
 
         .move-buttons {
@@ -453,6 +596,46 @@
             background: linear-gradient(45deg, #EE99AC, #E7707E);
         }
 
+        @keyframes throwBallOpponent {
+            0% {
+                transform: translate(200px, -100px) rotate(0deg);
+            }
+
+            60% {
+                transform: translate(0, 0) rotate(720deg);
+            }
+
+            100% {
+                transform: translate(0, 0) rotate(720deg);
+            }
+        }
+
+        @keyframes throwBallPlayer {
+            0% {
+                transform: translate(-200px, 100px) rotate(0deg);
+            }
+
+            60% {
+                transform: translate(0, 0) rotate(-720deg);
+            }
+
+            100% {
+                transform: translate(0, 0) rotate(-720deg);
+            }
+        }
+
+        @keyframes releasePokemon {
+            0% {
+                transform: scale(0);
+                opacity: 0;
+            }
+
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
         @media (max-width: 768px) {
             .battle-scene {
                 height: 300px;
@@ -488,8 +671,24 @@
         <div class="loading-text">Loading Battle...</div>
     </div>
 
+    <div class="battle-dialogue" id="player-dialogue"></div>
+    <div class="battle-dialogue" id="opponent-dialogue"></div>
+    <div class="battle-announcement" id="battle-announcement"></div>
+
     <div class="battle-container">
         <div class="battle-scene">
+            <!-- Battle terrain -->
+            <div class="battle-terrain"></div>
+            <div class="terrain-platform opponent-platform"></div>
+            <div class="terrain-platform player-platform"></div>
+
+            <!-- Pokeballs -->
+            <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/poke-ball.png"
+                alt="Pokeball" class="pokeball opponent-pokeball" id="opponent-pokeball">
+            <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/poke-ball.png"
+                alt="Pokeball" class="pokeball player-pokeball" id="player-pokeball">
+
+            <!-- Opponent's side -->
             <div class="opponent-area">
                 <div class="stats-box opponent-stats">
                     <div class="pokemon-name">{{ opponent_pokemon.name }}</div>
@@ -499,11 +698,14 @@
                     <div class="hp-text">HP: <span id="opponent-hp">{{ opponent_pokemon.stats.hp }}</span>/{{
                         opponent_pokemon.stats.hp }}</div>
                 </div>
-                <img src="{{ opponent_pokemon.image_front }}" alt="{{ opponent_pokemon.name }}"
-                    class="pokemon-sprite opponent-sprite" id="opponent-sprite">
+                <img src="{{ opponent_pokemon.image_front if opponent_pokemon.image_front else 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/poke-ball.png' }}"
+                    alt="{{ opponent_pokemon.name }}" class="pokemon-sprite opponent-sprite" id="opponent-sprite">
             </div>
 
+            <!-- Player's side -->
             <div class="player-area">
+                <img src="{{ user_pokemon.image_back if user_pokemon.image_back else 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/poke-ball.png' }}"
+                    alt="{{ user_pokemon.name }}" class="pokemon-sprite player-sprite" id="player-sprite">
                 <div class="stats-box player-stats">
                     <div class="pokemon-name">{{ user_pokemon.name }}</div>
                     <div class="hp-bar">
@@ -512,13 +714,24 @@
                     <div class="hp-text">HP: <span id="player-hp">{{ user_pokemon.stats.hp }}</span>/{{
                         user_pokemon.stats.hp }}</div>
                 </div>
-                <img src="{{ user_pokemon.image_back }}" alt="{{ user_pokemon.name }}"
-                    class="pokemon-sprite player-sprite" id="player-sprite">
+            </div>
+
+            <!-- Trainers -->
+            <div class="trainer-container opponent-trainer" id="opponent-trainer">
+                <img src="https://play.pokemonshowdown.com/sprites/trainers/{{ opponent_pokemon.trainer }}.png"
+                    alt="{{ opponent_pokemon.trainer }}" class="trainer-sprite">
+                <div class="trainer-name">{{ opponent_pokemon.trainer|capitalize }}</div>
+            </div>
+
+            <div class="trainer-container player-trainer" id="player-trainer">
+                <img src="https://play.pokemonshowdown.com/sprites/trainers/{{ user_pokemon.trainer }}.png"
+                    alt="{{ user_pokemon.trainer }}" class="trainer-sprite">
+                <div class="trainer-name">{{ user_pokemon.trainer|capitalize }}</div>
             </div>
         </div>
 
         <div class="battle-message" id="battle-message">
-            What will {{ user_pokemon.name }} do?
+            The battle is about to begin!
         </div>
 
         <div class="battle-controls">
@@ -534,7 +747,7 @@
         <a href="/" class="back-button">New Battle</a>
     </div>
 
-    <div class="battle-result hidden" id="battle-result">
+    <div class="battle-result" id="battle-result">
         <div class="result-content">
             <div class="result-title" id="result-title"></div>
             <div class="result-message" id="result-message"></div>
@@ -578,7 +791,6 @@
         const playerHpFill = document.getElementById('player-hp-fill');
         const playerHpText = document.getElementById('player-hp');
         const opponentHpFill = document.getElementById('opponent-hp-fill');
-
         const opponentHpText = document.getElementById('opponent-hp');
         const battleMessage = document.getElementById('battle-message');
         const moveButtons = document.getElementById('move-buttons');
@@ -734,14 +946,23 @@
 
         function updateHpBar(hpBar, currentHp, maxHp) {
             const percentage = (currentHp / maxHp) * 100;
+            const parentBar = hpBar.parentElement;
+
+            // Add damage animation
+            parentBar.classList.add('damage');
+            setTimeout(() => {
+                parentBar.classList.remove('damage');
+            }, 300);
+
+            // Smoothly update HP bar width and color
             hpBar.style.width = percentage + '%';
 
             if (percentage <= 20) {
-                hpBar.className = 'hp-fill red';
+                hpBar.style.background = 'linear-gradient(to right, #ff4444, #cc0000)';
             } else if (percentage <= 50) {
-                hpBar.className = 'hp-fill yellow';
+                hpBar.style.background = 'linear-gradient(to right, #ffd700, #ffa500)';
             } else {
-                hpBar.className = 'hp-fill';
+                hpBar.style.background = 'linear-gradient(to right, #00ff00, #48d048)';
             }
         }
 
@@ -758,8 +979,34 @@
             }
         }
 
-        // Hide loading overlay when everything is loaded
+        // Initialize battle scene when page loads
         window.addEventListener('load', function () {
+            const playerDialogue = document.getElementById('player-dialogue');
+            const opponentDialogue = document.getElementById('opponent-dialogue');
+            const announcement = document.getElementById('battle-announcement');
+            const playerTrainer = "{{ user_pokemon.trainer|capitalize }}";
+            const opponentTrainer = "{{ opponent_pokemon.trainer|capitalize }}";
+            const playerPokemon = "{{ user_pokemon.name }}";
+            const opponentPokemon = "{{ opponent_pokemon.name }}";
+
+            // Show player's dialogue first
+            playerDialogue.style.display = 'block';
+            playerDialogue.textContent = `${playerTrainer}: I choose you, ${playerPokemon}!`;
+
+            // Show opponent's dialogue after a delay
+            setTimeout(() => {
+                playerDialogue.style.display = 'none';
+                opponentDialogue.style.display = 'block';
+                opponentDialogue.textContent = `${opponentTrainer}: Go, ${opponentPokemon}!`;
+
+                // Start battle sequence after dialogues
+                setTimeout(() => {
+                    opponentDialogue.style.display = 'none';
+                    startBattleSequence();
+                }, 2000);
+            }, 2000);
+
+            // Hide loading overlay
             setTimeout(() => {
                 loadingOverlay.style.opacity = '0';
                 setTimeout(() => {
@@ -767,6 +1014,43 @@
                 }, 500);
             }, 500);
         });
+
+        function startBattleSequence() {
+            const opponentTrainer = document.getElementById('opponent-trainer');
+            const playerTrainer = document.getElementById('player-trainer');
+            const opponentPokeball = document.getElementById('opponent-pokeball');
+            const playerPokeball = document.getElementById('player-pokeball');
+            const opponentSprite = document.getElementById('opponent-sprite');
+            const playerSprite = document.getElementById('player-sprite');
+
+            // Show Pokeballs
+            opponentPokeball.style.opacity = '1';
+            playerPokeball.style.opacity = '1';
+
+            // Animate Pokeball throws
+            opponentPokeball.style.animation = 'throwBallOpponent 1s forwards';
+            playerPokeball.style.animation = 'throwBallPlayer 1s forwards';
+
+            // After Pokeballs land
+            setTimeout(() => {
+                // Hide trainers
+                opponentTrainer.style.opacity = '0';
+                playerTrainer.style.opacity = '0';
+
+                // Flash Pokeballs and release Pokémon
+                setTimeout(() => {
+                    opponentPokeball.style.opacity = '0';
+                    playerPokeball.style.opacity = '0';
+
+                    // Show Pokémon with animation
+                    opponentSprite.classList.add('active');
+                    playerSprite.classList.add('active');
+
+                    // Update battle message
+                    battleMessage.textContent = `What will ${userPokemon.name} do?`;
+                }, 500);
+            }, 1000);
+        }
     </script>
 </body>
 
