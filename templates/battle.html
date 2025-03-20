@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pokémon Battle</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+
+        .battle-container {
+            max-width: 800px;
+            margin: 20px auto;
+            position: relative;
+        }
+
+        .battle-scene {
+            background-color: #a8d5ba;
+            border-radius: 10px;
+            padding: 20px;
+            position: relative;
+            height: 300px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+
+        .opponent-area,
+        .player-area {
+            position: absolute;
+            width: 100%;
+        }
+
+        .opponent-area {
+            top: 20px;
+            left: 0;
+        }
+
+        .player-area {
+            bottom: 20px;
+            right: 0;
+            text-align: right;
+        }
+
+        .pokemon-sprite {
+            width: 120px;
+            height: 120px;
+            image-rendering: pixelated;
+        }
+
+        .opponent-sprite {
+            position: absolute;
+            top: 60px;
+            left: 400px;
+        }
+
+        .player-sprite {
+            position: absolute;
+            bottom: 60px;
+            left: 150px;
+        }
+
+        .hp-bar {
+            width: 150px;
+            height: 10px;
+            background-color: #ccc;
+            border-radius: 5px;
+            overflow: hidden;
+            margin-top: 5px;
+        }
+
+        .hp-fill {
+            height: 100%;
+            background-color: #78c850;
+            width: 100%;
+            transition: width 0.5s;
+        }
+
+        .hp-fill.yellow {
+            background-color: #f8d030;
+        }
+
+        .hp-fill.red {
+            background-color: #f05030;
+        }
+
+        .stats-box {
+            background-color: white;
+            border-radius: 5px;
+            padding: 10px;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+            display: inline-block;
+        }
+
+        .opponent-stats {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+        }
+
+        .player-stats {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+        }
+
+        .pokemon-name {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .battle-controls {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .battle-message {
+            background-color: white;
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 20px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+            min-height: 50px;
+            font-size: 18px;
+            text-align: center;
+        }
+
+        .move-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .move-button {
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            color: white;
+            text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.5);
+            transition: transform 0.1s, box-shadow 0.1s;
+        }
+
+        .move-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .move-button:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .move-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .type-normal {
+            background-color: #a8a878;
+        }
+
+        .type-fire {
+            background-color: #f08030;
+        }
+
+        .type-water {
+            background-color: #6890f0;
+        }
+
+        .type-electric {
+            background-color: #f8d030;
+        }
+
+        .type-grass {
+            background-color: #78c850;
+        }
+
+        .type-ice {
+            background-color: #98d8d8;
+        }
+
+        .type-fighting {
+            background-color: #c03028;
+        }
+
+        .type-poison {
+            background-color: #a040a0;
+        }
+
+        .type-ground {
+            background-color: #e0c068;
+        }
+
+        .type-flying {
+            background-color: #a890f0;
+        }
+
+        .type-psychic {
+            background-color: #f85888;
+        }
+
+        .type-bug {
+            background-color: #a8b820;
+        }
+
+        .type-rock {
+            background-color: #b8a038;
+        }
+
+        .type-ghost {
+            background-color: #705898;
+        }
+
+        .type-dragon {
+            background-color: #7038f8;
+        }
+
+        .type-dark {
+            background-color: #705848;
+        }
+
+        .type-steel {
+            background-color: #b8b8d0;
+        }
+
+        .type-fairy {
+            background-color: #ee99ac;
+        }
+
+        .back-button {
+            display: block;
+            width: 200px;
+            margin: 20px auto;
+            padding: 10px;
+            background-color: #3b5ba7;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            text-align: center;
+            text-decoration: none;
+        }
+
+        .back-button:hover {
+            background-color: #2a4580;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .battle-result {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .result-content {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            text-align: center;
+            max-width: 400px;
+        }
+
+        .result-title {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: #e3350d;
+        }
+
+        .result-message {
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+
+        .new-battle-button {
+            padding: 10px 20px;
+            background-color: #3b5ba7;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .new-battle-button:hover {
+            background-color: #2a4580;
+        }
+
+        /* Loading overlay */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.9);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+
+        .loading-spinner {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            border: 8px solid #f3f3f3;
+            border-top: 8px solid #3b5ba7;
+            animation: spin 1s linear infinite;
+        }
+
+        .loading-text {
+            margin-top: 20px;
+            font-size: 20px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Loading overlay -->
+    <div class="loading-overlay" id="loading-overlay">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">Loading Pokémon data...</div>
+    </div>
+
+    <div class="battle-container">
+        <div class="battle-scene">
+            <div class="opponent-area">
+                <div class="stats-box opponent-stats">
+                    <div class="pokemon-name">{{ opponent_pokemon.name }}</div>
+                    <div class="hp-bar">
+                        <div class="hp-fill" id="opponent-hp-fill"></div>
+                    </div>
+                    <div class="hp-text">HP: <span id="opponent-hp">{{ opponent_pokemon.stats.hp }}</span>/{{
+                        opponent_pokemon.stats.hp }}</div>
+                </div>
+                <img src="{{ opponent_pokemon.image_front }}" alt="{{ opponent_pokemon.name }}"
+                    class="pokemon-sprite opponent-sprite" id="opponent-sprite">
+            </div>
+
+            <div class="player-area">
+                <div class="stats-box player-stats">
+                    <div class="pokemon-name">{{ user_pokemon.name }}</div>
+                    <div class="hp-bar">
+                        <div class="hp-fill" id="player-hp-fill"></div>
+                    </div>
+                    <div class="hp-text">HP: <span id="player-hp">{{ user_pokemon.stats.hp }}</span>/{{
+                        user_pokemon.stats.hp }}</div>
+                </div>
+                <img src="{{ user_pokemon.image_back }}" alt="{{ user_pokemon.name }}"
+                    class="pokemon-sprite player-sprite" id="player-sprite">
+            </div>
+        </div>
+
+        <div class="battle-message" id="battle-message">
+            What will {{ user_pokemon.name }} do?
+        </div>
+
+        <div class="battle-controls">
+            <div class="move-buttons" id="move-buttons">
+                {% for move in user_pokemon.moves %}
+                <button class="move-button type-{{ move.type }}" data-move-id="{{ move.id }}">
+                    {{ move.name }}
+                </button>
+                {% endfor %}
+            </div>
+        </div>
+
+        <a href="/" class="back-button">Back to Selection</a>
+    </div>
+
+    <div class="battle-result hidden" id="battle-result">
+        <div class="result-content">
+            <div class="result-title" id="result-title"></div>
+            <div class="result-message" id="result-message"></div>
+            <button class="new-battle-button" onclick="window.location.href='/'">New Battle</button>
+        </div>
+    </div>
+
+    <script>
+        // Store Pokémon data with error handling
+        const userPokemon = {
+            name: "{{ user_pokemon.name }}",
+            stats: {
+                hp: parseInt("{{ user_pokemon.stats.hp }}") || 50,
+                attack: parseInt("{{ user_pokemon.stats.attack }}") || 50,
+                defense: parseInt("{{ user_pokemon.stats.defense }}") || 50,
+                'special-attack': parseInt("{{ user_pokemon.stats['special-attack'] }}") || 50,
+                'special-defense': parseInt("{{ user_pokemon.stats['special-defense'] }}") || 50,
+                speed: parseInt("{{ user_pokemon.stats.speed }}") || 50
+            },
+            current_hp: parseInt("{{ user_pokemon.stats.hp }}") || 50,
+            moves: JSON.parse('{{ user_pokemon.moves|tojson|safe }}'),
+            types: JSON.parse('{{ user_pokemon.types|tojson|safe }}')
+        };
+
+        const opponentPokemon = {
+            name: "{{ opponent_pokemon.name }}",
+            stats: {
+                hp: parseInt("{{ opponent_pokemon.stats.hp }}") || 50,
+                attack: parseInt("{{ opponent_pokemon.stats.attack }}") || 50,
+                defense: parseInt("{{ opponent_pokemon.stats.defense }}") || 50,
+                'special-attack': parseInt("{{ opponent_pokemon.stats['special-attack'] }}") || 50,
+                'special-defense': parseInt("{{ opponent_pokemon.stats['special-defense'] }}") || 50,
+                speed: parseInt("{{ opponent_pokemon.stats.speed }}") || 50
+            },
+            current_hp: parseInt("{{ opponent_pokemon.stats.hp }}") || 50,
+            moves: JSON.parse('{{ opponent_pokemon.moves|tojson|safe }}'),
+            types: JSON.parse('{{ opponent_pokemon.types|tojson|safe }}')
+        };
+
+        // DOM elements
+        const playerHpFill = document.getElementById('player-hp-fill');
+        const playerHpText = document.getElementById('player-hp');
+        const opponentHpFill = document.getElementById('opponent-hp-fill');
+        const opponentHpText = document.getElementById('opponent-hp');
+        const battleMessage = document.getElementById('battle-message');
+        const moveButtons = document.getElementById('move-buttons');
+        const battleResult = document.getElementById('battle-result');
+        const resultTitle = document.getElementById('result-title');
+        const resultMessage = document.getElementById('result-message');
+        const loadingOverlay = document.getElementById('loading-overlay');
+
+        // Initialize HP bars
+        updateHpBar(playerHpFill, userPokemon.current_hp, userPokemon.stats.hp);
+        updateHpBar(opponentHpFill, opponentPokemon.current_hp, opponentPokemon.stats.hp);
+
+        // Add event listeners to move buttons
+        document.querySelectorAll('.move-button').forEach(button => {
+            button.addEventListener('click', function () {
+                const moveId = this.getAttribute('data-move-id');
+                useMove(moveId);
+
+                // Disable all move buttons during attack sequence
+                document.querySelectorAll('.move-button').forEach(btn => {
+                    btn.disabled = true;
+                });
+            });
+        });
+
+        function useMove(moveId) {
+            // Prepare data for the attack
+            const attackData = {
+                user_pokemon: userPokemon,
+                opponent_pokemon: opponentPokemon,
+                move_id: parseInt(moveId)
+            };
+
+            // Send attack data to server
+            fetch('/attack', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(attackData)
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.error) {
+                        throw new Error(data.error);
+                    }
+                    processAttack(data);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    battleMessage.textContent = 'An error occurred during the battle.';
+
+                    // Re-enable move buttons
+                    document.querySelectorAll('.move-button').forEach(btn => {
+                        btn.disabled = false;
+                    });
+                });
+        }
+
+        function processAttack(data) {
+            // Update battle message with user's attack
+            battleMessage.textContent = data.message;
+
+            // Update opponent's HP
+            opponentPokemon.current_hp = data.opponent_hp;
+
+            // Animate opponent taking damage
+            setTimeout(() => {
+                updateHpBar(opponentHpFill, opponentPokemon.current_hp, opponentPokemon.stats.hp);
+                opponentHpText.textContent = opponentPokemon.current_hp;
+
+                // Check if opponent fainted
+                if (data.opponent_fainted) {
+                    setTimeout(() => {
+                        document.getElementById('opponent-sprite').style.opacity = 0.3;
+                        battleMessage.textContent = `${opponentPokemon.name} fainted!`;
+
+                        // Show battle result
+                        setTimeout(() => {
+                            showBattleResult(true);
+                        }, 1500);
+                    }, 1000);
+                    return;
+                }
+
+                // Opponent's counter-attack
+                setTimeout(() => {
+                    battleMessage.textContent = data.opponent_message;
+
+                    // Update user's HP
+                    userPokemon.current_hp = data.user_hp;
+
+                    setTimeout(() => {
+                        updateHpBar(playerHpFill, userPokemon.current_hp, userPokemon.stats.hp);
+                        playerHpText.textContent = userPokemon.current_hp;
+
+                        // Check if user fainted
+                        if (data.user_fainted) {
+                            setTimeout(() => {
+                                document.getElementById('player-sprite').style.opacity = 0.3;
+                                battleMessage.textContent = `${userPokemon.name} fainted!`;
+
+                                // Show battle result
+                                setTimeout(() => {
+                                    showBattleResult(false);
+                                }, 1500);
+                            }, 1000);
+                            return;
+                        }
+
+                        // Re-enable move buttons for next turn
+                        setTimeout(() => {
+                            battleMessage.textContent = `What will ${userPokemon.name} do?`;
+                            document.querySelectorAll('.move-button').forEach(btn => {
+                                btn.disabled = false;
+                            });
+                        }, 1000);
+                    }, 1000);
+                }, 1500);
+            }, 1000);
+        }
+
+        function updateHpBar(hpBar, currentHp, maxHp) {
+            const percentage = (currentHp / maxHp) * 100;
+            hpBar.style.width = percentage + '%';
+
+            // Change color based on HP percentage
+            if (percentage <= 20) {
+                hpBar.className = 'hp-fill red';
+            } else if (percentage <= 50) {
+                hpBar.className = 'hp-fill yellow';
+            } else {
+                hpBar.className = 'hp-fill';
+            }
+        }
+
+        function showBattleResult(userWon) {
+            battleResult.classList.remove('hidden');
+
+            if (userWon) {
+                resultTitle.textContent = 'Victory!';
+                resultMessage.textContent = `${userPokemon.name} defeated ${opponentPokemon.name}!`;
+            } else {
+                resultTitle.textContent = 'Defeat!';
+                resultMessage.textContent = `${opponentPokemon.name} defeated ${userPokemon.name}!`;
+            }
+        }
+
+        // Hide loading overlay when everything is loaded
+        window.addEventListener('load', function () {
+            // Give a small delay to ensure everything is rendered
+            setTimeout(() => {
+                loadingOverlay.classList.add('hidden');
+            }, 500);
+        });
+    </script>
+</body>
+
+</html>
