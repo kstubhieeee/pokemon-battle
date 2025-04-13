@@ -60,6 +60,8 @@ services:
     envVars:
       - key: PYTHON_VERSION
         value: 3.9.0
+      - key: PORT
+        value: 10000
 EOL
     echo "render.yaml created successfully."
 fi
@@ -67,7 +69,7 @@ fi
 # Create a Procfile for gunicorn
 if [ ! -f Procfile ]; then
     echo "Creating Procfile..."
-    echo "web: gunicorn main:app" > Procfile
+    echo "web: gunicorn main:app --bind 0.0.0.0:\$PORT" > Procfile
     echo "Procfile created successfully."
 fi
 
@@ -95,7 +97,7 @@ echo "   - Environment: Python"
 echo "   - Region: Choose closest to your users"
 echo "   - Branch: main (or your default branch)"
 echo "   - Build Command: pip install -r requirements.txt"
-echo "   - Start Command: gunicorn main:app"
+echo "   - Start Command: gunicorn main:app --bind 0.0.0.0:\$PORT"
 echo ""
 echo "6. Click 'Create Web Service'"
 echo ""
