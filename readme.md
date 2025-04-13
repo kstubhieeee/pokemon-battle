@@ -9,6 +9,7 @@ A web-based Pokémon battle simulator that allows users to choose trainers and P
 ![Pokémon Battle Simulator](https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/152.png)
 ![Pokémon Battle Simulator](https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/155.png)
 ![Pokémon Battle Simulator](https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/158.png)
+![Pokémon Battle Simulator](https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/700.png)
 
 ## Features
 
