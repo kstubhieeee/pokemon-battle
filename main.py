@@ -3,6 +3,7 @@ import requests
 import random
 import math
 import time
+import json
 
 app = Flask(__name__)
 
@@ -16,14 +17,31 @@ def index():
     try:
         response = requests.get('https://pokeapi.co/api/v2/pokemon?limit=151')
         if response.status_code == 200:
-            pokemon_list = [pokemon['name'] for pokemon in response.json()['results']]
+            pokemon_data = []
+            pokemon_dict = {}
+            for pokemon in response.json()['results']:
+                # Extract ID from URL for image
+                pokemon_id = pokemon['url'].split('/')[-2]
+                pokemon_name = pokemon['name']
+                image_url = f"https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/{pokemon_id}.png"
+                
+                pokemon_data.append({
+                    'name': pokemon_name,
+                    'image': image_url
+                })
+                pokemon_dict[pokemon_name] = image_url
+            
+            pokemon_json = json.dumps(pokemon_dict)
+            return render_template('index.html', pokemon_data=pokemon_data, pokemon_json=pokemon_json)
         else:
-            pokemon_list = []
+            pokemon_data = []
+            pokemon_json = "{}"
     except Exception as e:
         print(f"Error fetching Pokémon list: {e}")
-        pokemon_list = []
+        pokemon_data = []
+        pokemon_json = "{}"
     
-    return render_template('index.html', pokemon_list=pokemon_list)
+    return render_template('index.html', pokemon_data=pokemon_data, pokemon_json=pokemon_json)
 
 @app.route('/battle', methods=['POST'])
 def battle():
@@ -39,11 +57,32 @@ def battle():
     user_data = fetch_pokemon_data(user_pokemon)
     opponent_data = fetch_pokemon_data(opponent_pokemon)
     
+    # Handle errors if either Pokémon wasn't found
+    error_pokemon = None
     if not user_data:
-        return render_template('index.html', error=f"Could not find Pokémon: {user_pokemon}")
-    
-    if not opponent_data:
-        return render_template('index.html', error=f"Could not find Pokémon: {opponent_pokemon}")
+        error_pokemon = user_pokemon
+    elif not opponent_data:
+        error_pokemon = opponent_pokemon
+        
+    if error_pokemon:
+        # Get fresh Pokémon data for the form
+        try:
+            response = requests.get('https://pokeapi.co/api/v2/pokemon?limit=151')
+            pokemon_dict = {}
+            for pokemon in response.json()['results']:
+                pokemon_id = pokemon['url'].split('/')[-2]
+                pokemon_name = pokemon['name']
+                pokemon_dict[pokemon_name] = f"https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/{pokemon_id}.png"
+            
+            pokemon_json = json.dumps(pokemon_dict)
+            pokemon_data = [{'name': p, 'image': pokemon_dict[p]} for p in pokemon_dict]
+            return render_template('index.html', 
+                                  pokemon_data=pokemon_data, 
+                                  pokemon_json=pokemon_json, 
+                                  error=f"Could not find Pokémon: {error_pokemon}")
+        except Exception as e:
+            print(f"Error preparing error response: {e}")
+            return render_template('index.html', error=f"Could not find Pokémon: {error_pokemon}")
     
     # Add trainer information
     user_data['trainer'] = user_trainer

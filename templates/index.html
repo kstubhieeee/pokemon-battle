@@ -65,6 +65,89 @@
             image-rendering: pixelated;
         }
 
+        .pokemon-preview {
+            width: 120px;
+            height: 120px;
+            margin: 10px auto;
+            display: block;
+            image-rendering: pixelated;
+            background-color: rgba(255, 255, 255, 0.5);
+            border-radius: 50%;
+            padding: 10px;
+            border: 2px solid #3b5ba7;
+            transition: all 0.3s ease;
+        }
+
+        .pokemon-preview:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 15px rgba(59, 91, 167, 0.4);
+        }
+
+        .pokemon-preview.randomizing {
+            animation: randomize-pokemon 1s ease-in-out;
+        }
+
+        @keyframes randomize-pokemon {
+            0% {
+                transform: scale(1) rotate(0deg);
+                opacity: 0.5;
+            }
+
+            50% {
+                transform: scale(1.2) rotate(180deg);
+                opacity: 1;
+            }
+
+            100% {
+                transform: scale(1) rotate(360deg);
+                opacity: 1;
+            }
+        }
+
+        .random-button {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #ffcb05, #e3a900);
+            border: 2px solid #3b5ba7;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 3px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .random-button:hover {
+            transform: rotate(180deg) scale(1.1);
+            box-shadow: 0 5px 10px rgba(59, 91, 167, 0.4);
+        }
+
+        .random-button:active {
+            transform: rotate(180deg) scale(0.95);
+        }
+
+        .random-all-button {
+            background: linear-gradient(45deg, #ffcb05, #e3a900);
+            border: 2px solid #3b5ba7;
+            color: #3b5ba7;
+            border-radius: 20px;
+            padding: 8px 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 3px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .random-all-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 10px rgba(59, 91, 167, 0.4);
+        }
+
+        .random-all-button:active {
+            transform: scale(0.95);
+        }
+
         label {
             display: block;
             margin-bottom: 10px;
@@ -388,28 +471,46 @@
             <div class="pokemon-selection">
                 <div>
                     <label for="user_pokemon">Your Pokémon</label>
-                    <select name="user_pokemon" id="user_pokemon" required>
-                        <option value="">Choose your Pokémon</option>
-                        {% for pokemon in pokemon_list %}
-                        <option value="{{ pokemon }}">{{ pokemon|capitalize }}</option>
-                        {% endfor %}
-                    </select>
+                    <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                        <select name="user_pokemon" id="user_pokemon" required style="flex-grow: 1;">
+                            <option value="">Choose your Pokémon</option>
+                            {% for pokemon in pokemon_data %}
+                            <option value="{{ pokemon.name }}">{{ pokemon.name|capitalize }}</option>
+                            {% endfor %}
+                        </select>
+                        <button type="button" id="random-user-pokemon" class="random-button" title="Random Pokémon">
+                            <span style="font-size: 18px;">🎲</span>
+                        </button>
+                    </div>
+                    <img src="" alt="Pokemon preview" id="user-pokemon-preview" class="pokemon-preview">
                 </div>
 
                 <div>
                     <label for="opponent_pokemon">Opponent's Pokémon</label>
-                    <select name="opponent_pokemon" id="opponent_pokemon" required>
-                        <option value="">Select opponent</option>
-                        {% for pokemon in pokemon_list %}
-                        <option value="{{ pokemon }}">{{ pokemon|capitalize }}</option>
-                        {% endfor %}
-                    </select>
+                    <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                        <select name="opponent_pokemon" id="opponent_pokemon" required style="flex-grow: 1;">
+                            <option value="">Select opponent</option>
+                            {% for pokemon in pokemon_data %}
+                            <option value="{{ pokemon.name }}">{{ pokemon.name|capitalize }}</option>
+                            {% endfor %}
+                        </select>
+                        <button type="button" id="random-opponent-pokemon" class="random-button" title="Random Pokémon">
+                            <span style="font-size: 18px;">🎲</span>
+                        </button>
+                    </div>
+                    <img src="" alt="Pokemon preview" id="opponent-pokemon-preview" class="pokemon-preview">
                 </div>
             </div>
 
             <button type="submit" id="start-button">
                 Start Battle!
             </button>
+
+            <div style="text-align: center; margin-top: 15px;">
+                <button type="button" id="random-all-button" class="random-all-button">
+                    <span style="font-size: 16px; margin-right: 8px;">🎲</span>Random All
+                </button>
+            </div>
         </form>
     </div>
 
@@ -511,6 +612,127 @@
 
         updateTrainerPreview('user_trainer', 'user-trainer-preview');
         updateTrainerPreview('opponent_trainer', 'opponent-trainer-preview');
+
+        // Update Pokémon preview images
+        const userPokemonSelect = document.getElementById('user_pokemon');
+        const opponentPokemonSelect = document.getElementById('opponent_pokemon');
+        const userPokemonPreview = document.getElementById('user-pokemon-preview');
+        const opponentPokemonPreview = document.getElementById('opponent-pokemon-preview');
+
+        // Pokemon image mapping from server
+        const pokemonImages = JSON.parse('{{ pokemon_json|safe }}');
+
+        // Function to select a random Pokémon
+        function selectRandomPokemon(selectElement, previewElement) {
+            const options = selectElement.querySelectorAll('option');
+            const validOptions = Array.from(options).filter(option => option.value !== '');
+
+            if (validOptions.length > 0) {
+                // Add animation class
+                previewElement.classList.add('randomizing');
+
+                // Remove animation class after animation completes
+                setTimeout(() => {
+                    previewElement.classList.remove('randomizing');
+                }, 1000);
+
+                const randomIndex = Math.floor(Math.random() * validOptions.length);
+                const randomOption = validOptions[randomIndex];
+                selectElement.value = randomOption.value;
+
+                // Create and dispatch a change event to trigger any event listeners
+                const changeEvent = new Event('change');
+                selectElement.dispatchEvent(changeEvent);
+
+                // Update the preview image for Pokémon
+                if (selectElement.id === 'user_pokemon' || selectElement.id === 'opponent_pokemon') {
+                    if (pokemonImages[randomOption.value]) {
+                        previewElement.src = pokemonImages[randomOption.value];
+                        previewElement.alt = randomOption.value;
+                    }
+                }
+                // Update the trainer preview image
+                else if (selectElement.id === 'user_trainer' || selectElement.id === 'opponent_trainer') {
+                    // The trainer previews should be updated by the existing trainer preview handlers
+                    // through the change event we dispatched
+                }
+            }
+        }
+
+        // Show random Pokémon on page load with a slight delay for visual effect
+        window.addEventListener('DOMContentLoaded', () => {
+            // Slightly delay random selection for visual effect
+            setTimeout(() => {
+                selectRandomPokemon(userPokemonSelect, userPokemonPreview);
+
+                // Add slight delay between selections
+                setTimeout(() => {
+                    selectRandomPokemon(opponentPokemonSelect, opponentPokemonPreview);
+                }, 300);
+            }, 500);
+        });
+
+        // Add event listeners to random buttons
+        document.getElementById('random-user-pokemon').addEventListener('click', function () {
+            selectRandomPokemon(userPokemonSelect, userPokemonPreview);
+
+            // Play a sound effect
+            const randomSound = new Audio('data:audio/wav;base64,UklGRl9vAAAKAAAABAAQAAABAAgAZGF0YU');
+            randomSound.volume = 0.3;
+            randomSound.play().catch(() => { });
+        });
+
+        document.getElementById('random-opponent-pokemon').addEventListener('click', function () {
+            selectRandomPokemon(opponentPokemonSelect, opponentPokemonPreview);
+
+            // Play a sound effect
+            const randomSound = new Audio('data:audio/wav;base64,UklGRl9vAAAKAAAABAAQAAABAAgAZGF0YU');
+            randomSound.volume = 0.3;
+            randomSound.play().catch(() => { });
+        });
+
+        // Random All button
+        document.getElementById('random-all-button').addEventListener('click', function () {
+            // Random trainers
+            selectRandomPokemon(document.getElementById('user_trainer'), document.getElementById('user-trainer-preview'));
+            setTimeout(() => {
+                selectRandomPokemon(document.getElementById('opponent_trainer'), document.getElementById('opponent-trainer-preview'));
+            }, 200);
+
+            // Random Pokémon
+            setTimeout(() => {
+                selectRandomPokemon(userPokemonSelect, userPokemonPreview);
+            }, 400);
+
+            setTimeout(() => {
+                selectRandomPokemon(opponentPokemonSelect, opponentPokemonPreview);
+            }, 600);
+
+            // Play a more elaborate sound effect
+            const randomAllSound = new Audio('data:audio/wav;base64,UklGRl9vAAAKAAAABAAQAAABAAgAZGF0YU');
+            randomAllSound.volume = 0.4;
+            randomAllSound.play().catch(() => { });
+        });
+
+        userPokemonSelect.addEventListener('change', function () {
+            const selectedPokemon = this.value;
+            if (selectedPokemon && pokemonImages[selectedPokemon]) {
+                userPokemonPreview.src = pokemonImages[selectedPokemon];
+                userPokemonPreview.alt = selectedPokemon;
+            } else {
+                userPokemonPreview.src = '';
+            }
+        });
+
+        opponentPokemonSelect.addEventListener('change', function () {
+            const selectedPokemon = this.value;
+            if (selectedPokemon && pokemonImages[selectedPokemon]) {
+                opponentPokemonPreview.src = pokemonImages[selectedPokemon];
+                opponentPokemonPreview.alt = selectedPokemon;
+            } else {
+                opponentPokemonPreview.src = '';
+            }
+        });
 
         // Prevent duplicate form submissions
         let formSubmitted = false;
